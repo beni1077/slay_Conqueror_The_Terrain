@@ -1,0 +1,23 @@
+export function drawHexagon(ctx, x, y, size, color) {
+    ctx.beginPath();
+
+    for (let i = 0; i < 6; i++) {
+        const angleInRadians = (60 * i - 30) * Math.PI / 180;
+        const cornerX = x + size * Math.cos(angleInRadians);
+        const cornerY = y + size * Math.sin(angleInRadians);
+
+        if (i == 0) {
+            ctx.moveTo(cornerX, cornerY);
+        }
+        else {
+            ctx.lineTo(cornerX, cornerY);
+        }
+    }
+    ctx.closePath();
+
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}

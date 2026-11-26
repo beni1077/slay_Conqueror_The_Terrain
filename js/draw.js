@@ -1,7 +1,5 @@
-export const centerX = 750;
-export const centerY = 625;
-export const hexSize = 25;
-
+import { tiles } from "./map.js";
+import { hexSize, hexToPixel } from "./hex.js";
 export function drawHexagon(ctx, x, y, size, color) {
     ctx.beginPath();
 
@@ -26,12 +24,13 @@ export function drawHexagon(ctx, x, y, size, color) {
     ctx.stroke();
 }
 
-export function hexToPixel(q, r) {
-    let x = centerX + (hexSize * Math.sqrt(3)) * (q + r / 2);
-    let y = centerY + hexSize * 1.5 * r;
-    let hexPosition = {
-        x: x,
-        y: y
+export function drawMap(ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    for (let tile of tiles.values()) {
+        let q = tile.q;
+        let r = tile.r;
+        let position = hexToPixel(q, r);
+
+        drawHexagon(ctx, position.x, position.y, hexSize, "green")
     }
-    return hexPosition;
 }

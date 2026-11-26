@@ -1,9 +1,9 @@
 
-import { createMap, setTileOwner } from "./map.js";
+import { generateMap } from "./map.js";
 import { drawMap } from "./draw.js";
-import { getTile } from "./map.js";
+import { getTile, tiles } from "./map.js";
 import { pixelToHex } from "./hex.js";
-import { createPlayers, players } from "./player.js";
+import { createPlayers } from "./player.js";
 
 
 const canvas = document.getElementById("gameBoard");
@@ -25,22 +25,9 @@ canvas.addEventListener("click", function (event) {
 })
 
 createPlayers(3);
-createMap(8);
-
-setTileOwner(0, 0, 0);
-setTileOwner(1, 0, 0);
-setTileOwner(1, -1, 0);
-setTileOwner(-3, 0, 1);
-setTileOwner(-3, 1, 1);
-setTileOwner(-2, 0, 1);
-setTileOwner(3, -3, 2);
-setTileOwner(4, -3, 2);
-setTileOwner(3, -2, 2);
-setTileOwner(0, 3, 3);
-setTileOwner(1, 3, 3);
-setTileOwner(0, 4, 3);
+generateMap(180, 240);
 
 drawMap(ctx, selectedTile);
-console.log(players)
+console.log(tiles.size);
 
 

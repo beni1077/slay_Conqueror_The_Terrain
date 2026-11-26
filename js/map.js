@@ -1,5 +1,5 @@
-import { hexKey } from "./hex.js";
-import { hexDirections } from "./hex.js";
+import { hexKey, hexDirections } from "./hex.js";
+import { randomInt, randomItem } from "./random.js";
 
 export const tiles = new Map();
 
@@ -58,4 +58,50 @@ export function setTileOwner(q, r, ownerId) {
         return;
     }
     currentTile.owner = ownerId;
+}
+
+//adds a tile to tiles(map))
+function addTile(q, r) {
+    if (tiles.has(hexKey(q, r)) == true) {
+        return getTile(q, r);
+    }
+    let newTile = createTile(q, r)
+    tiles.set(hexKey(q, r), newTile);
+
+    return newTile;
+
+}
+
+//returns empty neighboring tiles
+function getEmptyNeighbors(q, r) {
+    let emptyNeighbors = [];
+    for (let direction of hexDirections) {
+        let neighborQ = q + direction.q;
+        let neighborR = r + direction.r;
+
+        if (getTile(neighborQ, neighborR) == undefined) {
+            let emptyPosition = { q: neighborQ, r: neighborR };
+            emptyNeighbors.push(emptyPosition)
+        }
+    }
+    return emptyNeighbors;
+}
+
+export function generateMap(minTileNumber, maxTileNumber) {
+    tiles.clear();
+    let targetSize = randomInt(minTileNumber, maxTileNumber);
+    let existingTiles = [];
+    let startingTile = addTile(0, 0);
+    existingTiles.push(startingTile);
+
+    while (tiles.size < targetSize) {
+        let currentTileToGoFrom = randomItem(existingTiles);
+        let emptyNeighborsOfCurrentTile = getEmptyNeighbors(currentTileToGoFrom.q, currentTileToGoFrom.r)
+
+        if (emptyNeighborsOfCurrentTile.length > 0) {
+            let randomNeighbor = randomItem(emptyNeighborsOfCurrentTile)
+            let newTile = addTile(randomNeighbor.q, randomNeighbor.r);
+            existingTiles.push(newTile)
+        }
+    }
 }

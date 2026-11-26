@@ -1,4 +1,4 @@
-import { hexKey, hexDirections } from "./hex.js";
+import { hexKey, hexDirections, hexDistance } from "./hex.js";
 import { randomInt, randomItem } from "./random.js";
 
 export const tiles = new Map();
@@ -87,21 +87,48 @@ function getEmptyNeighbors(q, r) {
     return emptyNeighbors;
 }
 
+//generates a map randomly between the given tile numbers
 export function generateMap(minTileNumber, maxTileNumber) {
     tiles.clear();
     let targetSize = randomInt(minTileNumber, maxTileNumber);
-    let existingTiles = [];
-    let startingTile = addTile(0, 0);
-    existingTiles.push(startingTile);
 
-    while (tiles.size < targetSize) {
-        let currentTileToGoFrom = randomItem(existingTiles);
-        let emptyNeighborsOfCurrentTile = getEmptyNeighbors(currentTileToGoFrom.q, currentTileToGoFrom.r)
+    growMainIsland(targetSize);
+}
 
-        if (emptyNeighborsOfCurrentTile.length > 0) {
-            let randomNeighbor = randomItem(emptyNeighborsOfCurrentTile)
-            let newTile = addTile(randomNeighbor.q, randomNeighbor.r);
-            existingTiles.push(newTile)
+//get all frontier positions for possible expansion of the map
+function getFrontier() {
+    let frontier = new Map();
+
+    for (let tile of tiles.values()) {
+        let emptyNeighborPositions = getEmptyNeighbors(tile.q, tile.r);
+        for (let possiblePosition of emptyNeighborPositions) {
+            let key = hexKey(possiblePosition.q, possiblePosition.r);
+            let distance = hexDistance(possiblePosition.q, possiblePosition.r, 0, 0);
+
+            if (distance > 15) {
+                continue
+            }
+            frontier.set(key, possiblePosition);
         }
+    }
+    let positions = [];
+    for (let position of frontier.values()) {
+        positions.push(position)
+    }
+    return positions;
+}
+
+//defines how the island grows, helper function for generateMap
+function growMainIsland(targetSize) {
+    addTile(0, 0); //starting tile
+    while (tiles.size < targetSize) {
+        let frontierPositions = getFrontier();
+
+        if (frontierPositions.length == 0) {
+            break;
+        }
+        let randomFrontierPosition = randomItem(frontierPositions);
+        addTile(randomFrontierPosition.q, randomFrontierPosition.r); //add the new tile
+
     }
 }

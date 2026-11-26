@@ -127,8 +127,56 @@ function growMainIsland(targetSize) {
         if (frontierPositions.length == 0) {
             break;
         }
-        let randomFrontierPosition = randomItem(frontierPositions);
-        addTile(randomFrontierPosition.q, randomFrontierPosition.r); //add the new tile
+        let weighted = []; //stores all positions calculated weight
+        let totalWeight = 0; //sum of all the weights
 
+        for (let position of frontierPositions) { //calculating every positions weight
+            let weight = getWeightedGrowth(position);
+            let weightedDetails = {
+                position: position,
+                weight: weight
+            }
+            weighted.push(weightedDetails);
+            totalWeight += weight;
+        }
+
+        let choice = Math.random() * totalWeight; //generating random weight
+
+        for (let current of weighted) { //candidate selection+adding 1 tile
+            choice -= current.weight;
+            if (choice <= 0) {
+                addTile(current.position.q, current.position.r);
+                break
+            }
+        }
     }
+}
+
+//counts existing neighbors of a tile
+function countExistingNeighbors(q, r) {
+    let existingNeighbors = getNeighbors(q, r);
+
+    return existingNeighbors.length;
+}
+
+//chooses how desirable a tile is when selecting for growth
+function getWeightedGrowth(position) {
+    let distanceFromCenter = hexDistance(position.q, position.r, 0, 0);
+    let neighbors = countExistingNeighbors(position.q, position.r);
+    let compactnessNumber = 1.3;
+
+    if (neighbors == 1) {
+        compactnessNumber = 0.75;
+    }
+    else if (neighbors == 2) {
+        compactnessNumber = 1.65;
+    }
+    else if (neighbors == 3) {
+        compactnessNumber = 2.2;
+    }
+
+    let distanceWeight = Math.max(0.12, 1 - distanceFromCenter / 17);
+    let randomness = 0.5 + Math.random();
+
+    return compactnessNumber * distanceWeight * randomness;
 }

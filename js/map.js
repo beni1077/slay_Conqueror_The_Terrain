@@ -1,4 +1,5 @@
 import { hexKey } from "./hex.js";
+import { hexDirections } from "./hex.js";
 
 export const tiles = new Map();
 
@@ -21,4 +22,22 @@ export function createMap(radius) {
             }
         }
     }
+}
+export function getTile(q, r) {
+    let key = hexKey(q, r);
+    let tileToReturn = tiles.get(key);
+    return tileToReturn;
+}
+export function getNeighbors(q, r) {
+    let neighbors = [];
+    for (let direction of hexDirections) {
+        let neighborQ = q + direction.q;
+        let neighborR = r + direction.r;
+        let neighborTile = getTile(neighborQ, neighborR);
+
+        if (neighborTile !== undefined) {
+            neighbors.push(neighborTile);
+        }
+    }
+    return neighbors;
 }

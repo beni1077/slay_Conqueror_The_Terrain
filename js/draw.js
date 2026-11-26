@@ -1,5 +1,7 @@
 import { tiles } from "./map.js";
 import { hexSize, hexToPixel } from "./hex.js";
+
+//drawing one hexagon
 export function drawHexagon(ctx, x, y, size, color) {
     ctx.beginPath();
 
@@ -24,13 +26,19 @@ export function drawHexagon(ctx, x, y, size, color) {
     ctx.stroke();
 }
 
-export function drawMap(ctx) {
+//drawing multiple hexagons
+export function drawMap(ctx, selectedTile) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     for (let tile of tiles.values()) {
         let q = tile.q;
         let r = tile.r;
         let position = hexToPixel(q, r);
+        let color = "green";
 
-        drawHexagon(ctx, position.x, position.y, hexSize, "green")
+        if (tile == selectedTile) {
+            color = "yellow"
+        }
+
+        drawHexagon(ctx, position.x, position.y, hexSize, color)
     }
 }

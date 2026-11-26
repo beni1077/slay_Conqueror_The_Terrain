@@ -3,6 +3,7 @@ import { hexDirections } from "./hex.js";
 
 export const tiles = new Map();
 
+//stores axial coordinate for a hexagon
 function createTile(q, r) {
     let tile = {
         q: q,
@@ -10,6 +11,8 @@ function createTile(q, r) {
     }
     return tile;
 }
+
+//tells how many layers to draw around the starting hex
 export function createMap(radius) {
     tiles.clear();
 
@@ -23,11 +26,15 @@ export function createMap(radius) {
         }
     }
 }
+
+//search for a given tile by mapkey
 export function getTile(q, r) {
     let key = hexKey(q, r);
     let tileToReturn = tiles.get(key);
     return tileToReturn;
 }
+
+//gives back an array of neighbor tiles of a hex
 export function getNeighbors(q, r) {
     let neighbors = [];
     for (let direction of hexDirections) {

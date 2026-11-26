@@ -1,5 +1,6 @@
 import { tiles } from "./map.js";
 import { hexSize, hexToPixel } from "./hex.js";
+import { getPlayer } from "./player.js";
 
 //drawing one hexagon
 export function drawHexagon(ctx, x, y, size, color) {
@@ -33,7 +34,14 @@ export function drawMap(ctx, selectedTile) {
         let q = tile.q;
         let r = tile.r;
         let position = hexToPixel(q, r);
-        let color = "green";
+        let color = "lightgray";
+
+        if (tile.owner != null) {
+            let currentPlayer = getPlayer(tile.owner);
+            if (currentPlayer != undefined) {
+                color = currentPlayer.color
+            }
+        }
 
         if (tile == selectedTile) {
             color = "yellow"

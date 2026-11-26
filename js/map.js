@@ -7,7 +7,8 @@ export const tiles = new Map();
 function createTile(q, r) {
     let tile = {
         q: q,
-        r: r
+        r: r,
+        owner: null
     }
     return tile;
 }
@@ -47,4 +48,14 @@ export function getNeighbors(q, r) {
         }
     }
     return neighbors;
+}
+
+//sets a tile's owner to the given player
+export function setTileOwner(q, r, ownerId) {
+    let currentTile = getTile(q, r);
+
+    if (currentTile == undefined) {
+        return;
+    }
+    currentTile.owner = ownerId;
 }

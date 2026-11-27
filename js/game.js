@@ -1,9 +1,9 @@
 
-import { chooseTerritoryStartingTiles, generateMap, setTileOwner } from "./map.js";
+import { generateMap } from "./map.js";
 import { drawMap } from "./draw.js";
 import { getTile, tiles } from "./map.js";
 import { pixelToHex } from "./hex.js";
-import { createPlayers } from "./player.js";
+import { createPlayers, players } from "./player.js";
 
 const canvas = document.getElementById("gameBoard");
 const ctx = canvas.getContext("2d");
@@ -24,15 +24,10 @@ canvas.addEventListener("click", function (event) {
 })
 
 createPlayers(3);
-generateMap(180, 240);
-
-let startingTiles = chooseTerritoryStartingTiles(8);
-for (let startingTile of startingTiles) {
-    setTileOwner(startingTile.q, startingTile.r, 1)
-}
+let startingRegions = generateMap(180, 240, players);
 drawMap(ctx, selectedTile);
 
-console.log(startingTiles);
-console.log(startingTiles.length);
+console.log(startingRegions);
+console.log(startingRegions.length);
 console.log(tiles.size);
 

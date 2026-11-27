@@ -90,13 +90,15 @@ function getEmptyNeighbors(q, r) {
 }
 
 //generates a map randomly between the given tile numbers
-export function generateMap(minTileNumber, maxTileNumber) {
+export function generateMap(minTileNumber, maxTileNumber, players) {
     tiles.clear();
     let targetSize = randomInt(minTileNumber, maxTileNumber);
 
     growMainIsland(targetSize);
-
     generateTerrain(tiles);
+    let regions = assingStartingTerritories(players);
+
+    return regions;
 }
 
 //get all frontier positions for possible expansion of the map
@@ -247,3 +249,81 @@ export function chooseTerritoryStartingTiles(startingTilesCount) {
     return startingTiles;
 }
 
+//assings starting territories and it's tiles to every player
+function assingStartingTerritories(players) {
+    let playerIds = [];
+
+    for (let player of players) { //giving playerIds all hte id-s
+        playerIds.push(player.id)
+    }
+
+    let regionsPerPlayer = 2;
+    let startingTilesCount = playerIds.length * regionsPerPlayer;
+    let startingTiles = chooseTerritoryStartingTiles(startingTilesCount);
+    let regions = [];
+
+    for (let i = 0; i < startingTiles.length; i++) { //assinging properties to regions
+        let playerIndex = i % playerIds.length; //cycling through the player array
+        let regionDetails = {
+            owner: playerIds[playerIndex],
+            tiles: [startingTiles[i]],
+            targetSize: randomInt(5, 9)
+        }
+        regions.push(regionDetails);
+    }
+    for (let region of regions) { //giving owners to the tiles
+        region.tiles[0].owner = region.owner
+    }
+
+    let isRegionChanged = true; //preventing infinite loop
+    while (isRegionChanged == true) {
+        isRegionChanged = false;
+        for (let region of regions) {
+            if (region.tiles.length >= region.targetSize) {
+                continue;
+            }
+            let neutralFrontier = new Map();
+            for (let tile of region.tiles) { //collect neutral neighboring tiles
+                let neighbors = getNeighbors(tile.q, tile.r);
+                for (let neighbor of neighbors) {
+                    if (neighbor.owner != null) {
+                        continue;
+                    }
+                    let key = hexKey(neighbor.q, neighbor.r)
+                    neutralFrontier.set(key, neighbor);
+                }
+            }
+            if (neutralFrontier.size == 0) {
+                continue
+            }
+            let possibleChoices = [];
+            for (let tile of neutralFrontier.values()) {
+                possibleChoices.push(tile)
+            }
+            possibleChoices.sort(function (a, b) {  //sort candidates by how many friendly neighbors they have
+                let scoreA = countFriendlyNeighbors(a, region.owner);
+                let scoreB = countFriendlyNeighbors(b, region.owner);
+
+                return scoreB - scoreA + (Math.random() - 0.5);
+            })
+            let chosen = possibleChoices[0]; //selecting the tile with the most friendly neighbors
+            chosen.owner = region.owner;
+            region.tiles.push(chosen);
+            isRegionChanged = true;
+        }
+    }
+    return regions;
+}
+
+//counts friendly neighboring tiles
+function countFriendlyNeighbors(tile, ownerId) {
+    let neighbors = getNeighbors(tile.q, tile.r);
+    let friendlyNeighborCount = 0;
+
+    for (let neighbor of neighbors) {
+        if (neighbor.owner == ownerId) {
+            friendlyNeighborCount += 1;
+        }
+    }
+    return friendlyNeighborCount;
+}

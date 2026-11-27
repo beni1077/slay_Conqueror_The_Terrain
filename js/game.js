@@ -1,33 +1,24 @@
-
-import { generateMap } from "./map.js";
-import { drawMap } from "./draw.js";
-import { getTile, tiles } from "./map.js";
-import { pixelToHex } from "./hex.js";
-import { createPlayers, players } from "./player.js";
+import { gameEngine } from "./engine.js";
+import { createGameState } from "./state.js";
 
 const canvas = document.getElementById("gameBoard");
 const ctx = canvas.getContext("2d");
-let selectedTile = null;
+let state = createGameState();
+let game = new gameEngine(state, ctx);
+
 canvas.addEventListener("click", function (event) {
-    let mouseX = event.offsetX;
-    let mouseY = event.offsetY;
-    let mousePosition = pixelToHex(mouseX, mouseY);
-    let currentTile = getTile(mousePosition.q, mousePosition.r);
-    if (currentTile != undefined) {
-        selectedTile = currentTile;
+    let action = {
+        type: "canvasClick",
+        x: event.offsetX,
+        y: event.offsetY
     }
-    else {
-        selectedTile = null;
-    }
-    console.log(selectedTile);
-    drawMap(ctx, selectedTile);
+    game.input(action);
 })
 
-createPlayers(3);
-let startingRegions = generateMap(180, 240, players);
-drawMap(ctx, selectedTile);
+let action = {
+    type: "newGame",
+    aiCount: 3
+}
+game.input(action);
 
-console.log(startingRegions);
-console.log(startingRegions.length);
-console.log(tiles.size);
-
+console.log(state);

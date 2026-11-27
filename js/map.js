@@ -1,5 +1,6 @@
 import { hexKey, hexDirections, hexDistance } from "./hex.js";
-import { randomInt, randomItem } from "./random.js";
+import { randomInt } from "./random.js";
+import { generateTerrain } from "./terrain.js";
 
 export const tiles = new Map();
 
@@ -94,6 +95,8 @@ export function generateMap(minTileNumber, maxTileNumber) {
     let targetSize = randomInt(minTileNumber, maxTileNumber);
 
     growMainIsland(targetSize);
+
+    generateTerrain(tiles);
 }
 
 //get all frontier positions for possible expansion of the map

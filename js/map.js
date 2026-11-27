@@ -8,7 +8,8 @@ function createTile(q, r) {
     let tile = {
         q: q,
         r: r,
-        owner: null
+        owner: null,
+        terrain: "grass"
     }
     return tile;
 }
@@ -180,3 +181,14 @@ function getWeightedGrowth(position) {
 
     return compactnessNumber * distanceWeight * randomness;
 }
+
+//helper function for testing
+export function setTileTerrainTo(q, r, terrainType) {
+    let currentTile = getTile(q, r);
+
+    if (currentTile == undefined) {
+        return
+    }
+    currentTile.terrain = terrainType;
+}
+

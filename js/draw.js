@@ -34,7 +34,17 @@ export function drawMap(ctx, selectedTile) {
         let q = tile.q;
         let r = tile.r;
         let position = hexToPixel(q, r);
-        let color = "lightgray";
+        let color = "lightgreen";
+
+        if (tile.terrain == "plains") {
+            color = "khaki";
+        }
+        else if (tile.terrain == "forest") {
+            color = "forestgreen";
+        }
+        else if (tile.terrain == "hills") {
+            color = "darkgray";
+        }
 
         if (tile.owner != null) {
             let currentPlayer = getPlayer(tile.owner);

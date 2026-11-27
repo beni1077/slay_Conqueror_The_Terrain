@@ -185,7 +185,7 @@ function getWeightedGrowth(position) {
     return compactnessNumber * distanceWeight * randomness;
 }
 
-//helper function for testing
+//helper function for testing and debugging
 export function setTileTerrainTo(q, r, terrainType) {
     let currentTile = getTile(q, r);
 
@@ -193,5 +193,57 @@ export function setTileTerrainTo(q, r, terrainType) {
         return
     }
     currentTile.terrain = terrainType;
+}
+
+//calculates the distance between a possible starting tile and closest already selected one
+function distanceToClosestStartingTile(candidate, startingTiles) {
+    if (startingTiles.length == 0) {
+        return hexDistance(candidate.q, candidate.r, 0, 0);
+    }
+    let closestDistance = null;
+
+    for (let startingTile of startingTiles) {
+        let distance = hexDistance(candidate.q, candidate.r, startingTile.q, startingTile.r);
+
+        if (closestDistance == null || distance < closestDistance) {
+            closestDistance = distance;
+        }
+    }
+    return closestDistance;
+}
+
+//chooses as many starting tiles as the parameter
+export function chooseTerritoryStartingTiles(startingTilesCount) {
+    let candidates = [];
+
+    for (let tile of tiles.values()) { //only select tiles with 3 or more neighbors
+        let neighborCount = countExistingNeighbors(tile.q, tile.r);
+        if (neighborCount >= 3) {
+            candidates.push(tile);
+        }
+    }
+    let startingTiles = [];
+
+    for (let i = 0; i < startingTilesCount; i++) {
+        let bestTile = null;
+        let bestScore = 0;
+
+        for (let candidate of candidates) {
+            if (startingTiles.includes(candidate)) {
+                continue;
+            }
+            //choosing the best candidate
+            let distance = distanceToClosestStartingTile(candidate, startingTiles);
+            let score = distance + Math.random() * 2;
+            if (bestTile == null || score > bestScore) {
+                bestScore = score;
+                bestTile = candidate;
+            }
+        }
+        if (bestTile != null) {
+            startingTiles.push(bestTile);
+        }
+    }
+    return startingTiles;
 }
 
